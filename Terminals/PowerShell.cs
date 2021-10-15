@@ -3,10 +3,17 @@ using System.Diagnostics;
 
 namespace Snippets.Terminals
 {
-  // Attempting to keep this code as simple as possible, this method simply runs a PowerShell instance as an asyncronous process then awaits and returns the redirected StandardOutput.
-  // The default/standard/included arguments are very basic, only requesting the command you want to run in PowerShell, the Execution Policy, and the path to the PowerShell executable (useful if you want to target different versions.)  
   public class PowerShell
   {
+      /* Attempting to keep this code as simple as possible, this class exposes only 2 methods. 
+       *  - [1: ExecuteCommand] Synchronously launches a  PowerShell (powershell.exe) instance and executes the command passed-through as an argument. Returns the redirected StandardOutput.
+       *  - [2: ExecuteCommandAsync] Asynchronously launches a PowerShell (powershell.exe) instance and executes the command passed-through as an argument. Awaits then returns the redirected StandardOutput.
+       * Default params were purposely kept basic, feel free to expand as needed.
+       * - [0: psCommand] The command or script to execute in the PowerShell instance.
+       * - [1: psPolicy] The ExecutionPolicy assigned when launching the PowerShell instance. Default: Bypass.
+       * - [2: psPath] The full path to the PowerShell executable. Useful if targeting specific versions. Default: powershell.exe
+      */
+    
       public enum ExecutionPolicies
       {
           AllSigned = 0,
