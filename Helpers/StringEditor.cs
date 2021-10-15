@@ -1,4 +1,6 @@
 using System;
+using System.Runtime.InteropServices;
+using System.Security;
 using Snippets.Dictionaries;
 
 namespace Snippets.Helpers
