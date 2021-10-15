@@ -8,7 +8,7 @@ namespace Snippets.Terminals
    *  - [2: RunCommandAsync] Asynchronously launches a Command Prompt (CMD.exe) instance and executes the command passed-through as an argument. Awaits then returns the redirected StandardOutput.
    * Default params were purposely kept basic, feel free to expand as needed.
    * - [0: userScript] The command or script to execute.
-   */
+  */
   
   public class CMD
   {
