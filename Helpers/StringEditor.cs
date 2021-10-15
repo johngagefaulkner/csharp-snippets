@@ -1,19 +1,20 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Snippets.Dictionaries;
 
 namespace Snippets.Helpers
 {
     public class StringEditor
     {
-        public static string GetFilePathWithoutQuotes(string inputFilePath)
+        public static string RemoveQuotes(string inputStr, bool alsoRemoveApostrophes = false)
         {
-            char quoteChar = '"';
-            string rev1 = inputFilePath.Replace(quoteChar.ToString(), "'");
-            string rev2 = "'" + rev1.Trim() + "'";
-            return rev2.Trim();
+            string _result = inputStr.Replace(Punctuation.GetString(Punctuation.PunctuationMark.QuotationMark), "");
+
+            if (alsoRemoveApostrophes == true)
+            {
+                _result = _result.Replace(Punctuation.GetString(Punctuation.PunctuationMark.Apostrophe), "");
+            }
+
+            return _result.Trim();
         }
     }
 }
