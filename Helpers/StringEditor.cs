@@ -5,7 +5,7 @@ namespace Snippets.Helpers
 {
     public class StringEditor
     {
-        // Easily remove Quotation Marks `"` and Apostrophes `'` from a string.
+        // Easily remove Quotation Marks (") and Apostrophes (') from a string.
         public static string RemoveQuotes(string inputStr, bool alsoRemoveApostrophes = false)
         {
             string _result = inputStr.Replace(Punctuation.GetString(Punctuation.PunctuationMark.QuotationMark), "");
