@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Security;
 using Snippets.Dictionaries;
@@ -32,7 +33,7 @@ namespace Snippets.Helpers
                 return _str.Trim();
             }
         }
-        
+
         public static string ConvertFromSecureString(SecureString secureString)
         {
             var valuePtr = IntPtr.Zero;
@@ -50,15 +51,39 @@ namespace Snippets.Helpers
         public static SecureString ConvertToSecureString(string clearText)
         {
             if (clearText == null)
+            {
                 throw new ArgumentNullException(nameof(clearText));
+            }
 
             var securePassword = new SecureString();
 
             foreach (var c in clearText)
+            {
                 securePassword.AppendChar(c);
+            }
 
             securePassword.MakeReadOnly();
             return securePassword;
+        }
+
+        /// <summary>
+        /// Splits a string into an array like the opposite of a StringBuilder.
+        /// </summary>
+        /// <param name="_inputStr">The string you want to split.</param>
+        /// <returns>An array of strings.</returns>
+        public static string[] SplitStringByNewLines(string _inputStr)
+        {
+            return _inputStr.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+        }
+
+        /// <summary>
+        /// Splits a file path (absolute or relative) using the system's directory separator character.
+        /// </summary>
+        /// <param name="_inputPath">The file path you want to split.</param>
+        /// <returns>An array of strings. For example, "C:\Users" would return "C:" and "Users".</returns>
+        public static string[] SplitPathByDirectories(string _inputPath)
+        {
+            return _inputPath.Split(Path.DirectorySeparatorChar);
         }
     }
 }
