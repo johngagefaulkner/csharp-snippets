@@ -363,13 +363,66 @@ namespace Snippets.Services
         }
         #endregion
 
+        private static void LoadDebugInfo(LogClient attachedClient)
+        {
+            try
+            {
+                attachedClient.LogDebug("[Log File] " + attachedClient.LogFilePath);
+                attachedClient.LogDebug("[Computer Name] " + Environment.MachineName + " (" + Environment.ProcessorCount.ToString() + " cores");
+
+                string osArch = "";
+                string processArch = "";
+
+                if (Environment.Is64BitOperatingSystem)
+                {
+                    osArch = "64-Bit";
+                }
+
+                if (!Environment.Is64BitOperatingSystem)
+                {
+                    osArch = "32-Bit";
+                }
+
+                if (Environment.Is64BitProcess)
+                {
+                    processArch = "x64";
+                }
+
+                if (!Environment.Is64BitProcess)
+                {
+                    processArch = "x86";
+                }
+
+                attachedClient.LogDebug("[Operating System] [" + osArch + "] " + Environment.OSVersion.VersionString);
+                attachedClient.LogDebug("[Current User] " + Environment.UserDomainName.ToString() + @"\" + Environment.UserName.ToString());
+                attachedClient.LogDebug("[Working Directory] " + Environment.CurrentDirectory);
+                attachedClient.LogDebug("[Process (ID:" + Environment.ProcessId.ToString() + ")] [" + processArch + "] " + Process.GetCurrentProcess().ProcessName);
+
+                // Obtain some basic information about the running application and environment.
+                StringBuilder sb = new();
+                foreach (var _arg in Environment.GetCommandLineArgs())
+                {
+                    sb.AppendLine(_arg);
+                }
+
+                string appArgs = sb.ToString().Trim();
+                attachedClient.LogDebug("[Arguments] " + appArgs);
+            }
+
+            catch (Exception ex)
+            {
+                string errorStr = "[Error] " + ex.Message;
+                Console.WriteLine(errorStr);
+            }
+        }
+
         /// <summary>
         /// Creates an interactable logging client to be used throughout your application.
         /// </summary>
         /// <param name="customLogOutput">[Optional] Select how the log output should be handled. Default writes to a log file and the Console.</param>
         /// <param name="customLogPath">[Optional] Set a custom log file path. Must be full (absolute) path.</param>
         /// <returns>Logging client object - a lumberjack to do your logging.</returns>
-        public static LogClient Create(LogOutputType customLogOutput = LogOutputType.Default, string customLogPath = null)
+        public static LogClient Create(bool DisplayDebugInfo = false, LogOutputType customLogOutput = LogOutputType.Default, string customLogPath = null)
         {
             LogClient _result = new();
 
@@ -383,24 +436,12 @@ namespace Snippets.Services
 
             try
             {
-                _result.LogInfo("LogClient successfully created and initialized! Running on Process: " + Process.GetCurrentProcess().ProcessName);
-
-                // Obtain some basic information about the running application and environment.
-                StringBuilder sb = new();
-                foreach (var _arg in Environment.GetCommandLineArgs())
+                _result.LogInfo("LogClient successfully created and initialized!");
+                
+                if (DisplayDebugInfo == true)
                 {
-                    sb.AppendLine(_arg);
+                    LoadDebugInfo(_result);
                 }
-
-                string appArgs = sb.ToString().Trim();
-                _result.LogInfo("[Arguments] " + appArgs);
-                _result.LogInfo("[Current Directory] " + Environment.CurrentDirectory);
-                _result.LogInfo("[Running as User] " + Environment.UserDomainName.ToString() + @"\" + Environment.UserName.ToString());
-                _result.LogInfo("[OS Version] " + Environment.OSVersion.ToString());
-                _result.LogInfo("[64-Bit OS] " + Environment.Is64BitOperatingSystem.ToString());
-                _result.LogInfo("[64-Bit Process] " + Environment.Is64BitProcess.ToString());
-                _result.LogInfo("[Process ID] " + Environment.ProcessId.ToString());
-                _result.LogInfo("[Processor Count] " + Environment.ProcessorCount.ToString());
 
                 return _result;
             }
