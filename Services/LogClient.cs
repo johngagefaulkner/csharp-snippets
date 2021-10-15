@@ -8,34 +8,21 @@ namespace Snippets.Services
 {
     public class LogClient
     {
-        #region LogClient-Config
-        private string filePath { get; set; } = null;
+        #region ClientConfiguration
+        private string PathToLogFile { get; set; } = null;
+        private LogOutputType _logOutputType { get; set; } = LogOutputType.Default;
 
-        public string LogPath
+        public string LogFilePath
         {
-            get { return filePath; }
-            set { filePath = value.Trim(); }
+            get { return PathToLogFile; }
+            set { PathToLogFile = value.Trim(); }
         }
-
-        public enum LogOutputType
-        {
-            Default = 0, // Console and File
-            Console, // Only writes log entries to console
-            ConsoleAndFile, // Writes log entries to both the console and the log file
-            Debug, // Only writes log entries to the Debug trace listeners
-            File, // Only writes log entries to the log file
-            All, // Writes log entries to all of the above
-            None // Disposes of all log entries.
-        }
-
-        private LogOutputType LogOutputLocation { get; set; } = LogOutputType.Default;
 
         public LogOutputType LogOutput
         {
-            get { return LogOutputLocation; }
-            set { LogOutputLocation = value; }
+            get { return _logOutputType; }
+            set { _logOutputType = value; }
         }
-
         #endregion
 
         #region Converters-Helpers-Extensions-etc
@@ -57,7 +44,18 @@ namespace Snippets.Services
         }
         #endregion
 
-        #region Log-Updates
+        #region Enums
+        public enum LogOutputType
+        {
+            Default = 0, // Console and File
+            Console, // Only writes log entries to console
+            ConsoleAndFile, // Writes log entries to both the console and the log file
+            Debug, // Only writes log entries to the Debug trace listeners
+            File, // Only writes log entries to the log file
+            All, // Writes log entries to all of the above
+            None // Disposes of all log entries.
+        }
+
         private enum Severity
         {
             INFO = 0, // Information
@@ -67,12 +65,14 @@ namespace Snippets.Services
             DEBUG, // Shouldn't be seen by users, only for debugging the application
             VERBOSE // Includes everything
         }
+        #endregion
 
+        #region Log-Updates
         private void UpdateLog(Severity logSev, string updateStr)
         {
             string _msg = GetTime() + GetSeverity(logSev) + updateStr.Trim();
 
-            switch (LogOutputLocation)
+            switch (_logOutputType)
             {
                 case LogOutputType.Default:
                     Console.WriteLine(_msg);
@@ -111,7 +111,7 @@ namespace Snippets.Services
         {
             string _msg = GetTime() + GetSeverity(logSev) + updateStr.Trim();
 
-            switch (LogOutputLocation)
+            switch (_logOutputType)
             {
                 case LogOutputType.Default:
                     Console.WriteLine(_msg);
@@ -252,7 +252,7 @@ namespace Snippets.Services
         {
             try
             {
-                System.IO.File.AppendAllText(filePath, appendStr.Trim() + Environment.NewLine);
+                System.IO.File.AppendAllText(PathToLogFile, appendStr.Trim() + Environment.NewLine);
                 return true;
             }
 
@@ -267,7 +267,7 @@ namespace Snippets.Services
         {
             try
             {
-                await System.IO.File.AppendAllTextAsync(filePath, appendStr.Trim() + Environment.NewLine);
+                await System.IO.File.AppendAllTextAsync(PathToLogFile, appendStr.Trim() + Environment.NewLine);
                 return true;
             }
 
@@ -284,7 +284,7 @@ namespace Snippets.Services
         {
             if (string.IsNullOrEmpty(customFilePath))
             {
-                return File.ReadAllText(filePath);
+                return File.ReadAllText(PathToLogFile);
             }
 
             else
@@ -297,7 +297,7 @@ namespace Snippets.Services
         {
             if (string.IsNullOrEmpty(customFilePath))
             {
-                return await File.ReadAllTextAsync(filePath);
+                return await File.ReadAllTextAsync(PathToLogFile);
             }
 
             else
@@ -318,7 +318,7 @@ namespace Snippets.Services
         {
             try
             {
-                System.IO.File.Copy(filePath, targetPath, _overwrite);
+                System.IO.File.Copy(PathToLogFile, targetPath, _overwrite);
                 return true;
             }
 
@@ -330,64 +330,56 @@ namespace Snippets.Services
         }
 
         /// <summary>
-        /// Creates a copy of the existing log file at the provided file path using async file IO.
+        /// Creates a copy of the existing log file at the provided file path using async file IO. Overwrites existing file.
         /// </summary>
         /// <param name="targetPath">Full (absolute) path to where the log file should be copied.</param>
-        /// <param name="_overwrite">Whether to overwrite the file if it already exists at the target file path.</param>
         /// <returns>[Bool] True/False, whether export was successful.</returns>
-        public async Task<bool> ExportLogAsync(string targetPath, bool _overwrite = true)
+        public async Task<bool> ExportLogAsync(string targetPath)
         {
-            string _time = GetTime();
-            string _thread = "[Thread] " + System.Threading.Thread.CurrentThread.Name;
-
             try
             {
-                System.Threading.Thread.CurrentThread.Name = "Main";
+                /* Method 1
+                 * string currentLogData = await File.ReadAllTextAsync(PathToLogFile);
+                 * await File.WriteAllTextAsync(targetPath, currentLogData);
+                 */
 
-                Console.WriteLine(_time + _thread);
-                Console.WriteLine(_time + _thread + ": Exporting log file, please wait... ");
+                // Method 2
+                using (FileStream SourceStream = File.Open(PathToLogFile, FileMode.Open))
+                {
+                    using (FileStream DestinationStream = File.Create(targetPath))
+                    {
+                        await SourceStream.CopyToAsync(DestinationStream);
+                    }
+                }
 
-                // Method 1
-                Task taskA = Task.Run(() => DuplicateLog(targetPath));
-                await taskA;
-
-                Console.WriteLine(_time + _thread + ": Log successfully exported to: " + targetPath);
                 return true;
             }
 
             catch (Exception ex)
             {
-                Console.WriteLine(_time + _thread + ": Failed to export log: " + ex.Message);
-                Console.WriteLine(_time + _thread + ": [Error Description] " + ex.ToString().Trim());
+                string errorStr = "[Error] " + ex.Message;
                 return false;
             }
-        }
-
-        public void DuplicateLog(string newPath)
-        {
-            string _time = "[" + DateTime.Now.ToLongTimeString() + "] ";
-            string _thread = "[Thread] " + System.Threading.Thread.CurrentThread.Name;
-            Console.WriteLine(_time + _thread);
-            Console.WriteLine(_time + _thread + ": Exporting log file, please wait... ");
-
-            System.IO.File.Copy(filePath, newPath, true);
-
-            Console.WriteLine(_time + _thread + ": Log successfully exported to: " + newPath);
         }
         #endregion
 
         /// <summary>
         /// Creates an interactable logging client to be used throughout your application.
         /// </summary>
+        /// <param name="customLogOutput">[Optional] Select how the log output should be handled. Default writes to a log file and the Console.</param>
         /// <param name="customLogPath">[Optional] Set a custom log file path. Must be full (absolute) path.</param>
         /// <returns>Logging client object - a lumberjack to do your logging.</returns>
-        public static LogClient Create(string customLogPath = null)
+        public static LogClient Create(LogOutputType customLogOutput = LogOutputType.Default, string customLogPath = null)
         {
             LogClient _result = new();
+
+            // Set log output type
+            _result.LogOutput = customLogOutput;
+
             // No log path specified by user, set log path to use default
-            if (string.IsNullOrEmpty(customLogPath)) { _result.LogPath = GenerateLogFileName(); }
+            if (string.IsNullOrEmpty(customLogPath)) { _result.LogFilePath = GenerateLogFileName(); }
             // Custom log path specified by user, override default log path
-            if (!string.IsNullOrEmpty(customLogPath)) { _result.LogPath = customLogPath; }
+            if (!string.IsNullOrEmpty(customLogPath)) { _result.LogFilePath = customLogPath; }
 
             try
             {
