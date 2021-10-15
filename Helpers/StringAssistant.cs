@@ -6,7 +6,7 @@ using Snippets.Dictionaries;
 
 namespace Snippets.Helpers
 {
-    public class StringEditor
+    public class StringAssistant
     {
         public static string RemoveQuotes(string inputStr, bool alsoRemoveApostrophes = false)
         {
