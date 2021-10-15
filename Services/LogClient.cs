@@ -403,12 +403,12 @@ namespace Snippets.Services
                 string appArgs = sb.ToString().Trim();
                 _result.LogInfo("[Arguments] " + appArgs);
                 _result.LogInfo("[Current Directory] " + Environment.CurrentDirectory);
-                _result.LogInfo("[Running as User]" + Environment.UserDomainName.ToString() + @"\" + Environment.UserName.ToString());
+                _result.LogInfo("[Running as User] " + Environment.UserDomainName.ToString() + @"\" + Environment.UserName.ToString());
                 _result.LogInfo("[OS Version] " + Environment.OSVersion.ToString());
                 _result.LogInfo("[64-Bit OS] " + Environment.Is64BitOperatingSystem.ToString());
                 _result.LogInfo("[64-Bit Process] " + Environment.Is64BitProcess.ToString());
-                _result.LogInfo("[Process ID]" + Environment.ProcessId.ToString());
-                _result.LogInfo("[Processor Count]" + Environment.ProcessorCount.ToString());
+                _result.LogInfo("[Process ID] " + Environment.ProcessId.ToString());
+                _result.LogInfo("[Processor Count] " + Environment.ProcessorCount.ToString());
 
                 return _result;
             }
