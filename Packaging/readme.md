@@ -3,4 +3,4 @@ This folder will contain all the different deployment methods I've tried through
 
 ## Articles, Tutorials, Guides, Walkthroughs and other types of Documentation
 - [Smoothly Deploying your App using Squirrel](https://tmp.lnk/)
-- [Creating and Building a Custom MSI using WixSharp](Packaging/WixSharp.md)
+- [Creating and Building a Custom MSI using WixSharp](WixSharp.md)
