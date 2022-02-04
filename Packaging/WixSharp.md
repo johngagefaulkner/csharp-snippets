@@ -1,4 +1,6 @@
 # WixSharp
+> **Requires:** [WixSharp](https://github.com/oleg-shilo/wixsharp)
+
 This is the bare minimum documentation because I didn't have time to copy everything from my phone earlier.
 
 ```csharp
