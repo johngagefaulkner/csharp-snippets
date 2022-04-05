@@ -194,8 +194,12 @@ Creating a Custom Profile is a simple, straight-forward, process. In the example
 var ps7AdminProfile = Terminals.Config.CustomProfiles.PowerShellProfile.Create(@"C:\Program Files\PowerShell\7\pwsh.exe", true, Terminals.ExecutionPolicy.Bypass, Terminals.PSVersion.PowerShell7);
 ```
 
-Creation of this profile enables us to now drastically reduce the code we write when we want to run a command/script using all the settings we defined above. For an easier comparison, we'll use the same "Storage Disks" code from the previous section. See the code example below:
+Creation of this profile enables us to now reduce code written to run a command/script using all the settings we defined above. For an easier comparison, we'll use the same "Storage Disks" code from the previous section. See the code example below:
 
 ```csharp
+// Normal method of running a PowerShell Command
+string diskResult = await Terminals.PowerShell.ExecuteCommandAsync(diskQuery, true, Terminals.ExecutionPolicy.Bypass, Terminals.PSVersion.PowerShell7);
+
+// Shortened method using a Custom Profile with predefined settings
 string diskResult = await Terminals.PowerShell.ExecuteCommandAsync(diskQuery, ps7AdminProfile);
 ```
