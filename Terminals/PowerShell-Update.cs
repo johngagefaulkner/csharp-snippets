@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Collections;
+using static Snippets.Terminals;
 
 namespace Snippets
 {
@@ -27,6 +28,44 @@ namespace Snippets
         {
             WindowsPowerShell = 0,
             PowerShell7 = 1
+        }
+
+        public class Config
+        {
+            public class CustomProfiles
+            {
+                public class CMDProfile
+                {
+                    public string? ExecutablePath { get; set; }
+                    public bool RunAsAdministrator { get; set; }
+
+                    public static CMDProfile Create(string exePath, bool runAsAdmin)
+                    {
+                        CMDProfile cmdProfile = new CMDProfile();
+                        cmdProfile.ExecutablePath = exePath;
+                        cmdProfile.RunAsAdministrator = runAsAdmin;
+                        return cmdProfile;
+                    }
+                }
+
+                public class PowerShellProfile
+                {
+                    public string? ExecutablePath { get; set; }
+                    public bool RunAsAdministrator { get; set; }
+                    public ExecutionPolicy ExecutionPolicy { get; set; }
+                    public PSVersion PSVersion { get; set; }
+
+                    public static PowerShellProfile Create(string exePath, bool runAsAdmin, ExecutionPolicy exePolicy, PSVersion _version)
+                    {
+                        PowerShellProfile _profile = new();
+                        _profile.ExecutablePath = exePath;
+                        _profile.RunAsAdministrator = runAsAdmin;
+                        _profile.ExecutionPolicy = exePolicy;
+                        _profile.PSVersion = _version;
+                        return _profile;
+                    }
+                }
+            }
         }
 
         internal class Tools
@@ -208,6 +247,32 @@ namespace Snippets
                 }
             }
 
+            /// <summary>
+            /// Launches a PowerShell instance using a Custom Profile and synchronously executes the specified command.
+            /// </summary>
+            /// <param name="psCommand">The command to execute in the PowerShell instance.</param>
+            /// <param name="psProfile">The Custom Profile object containing predefined values for the required parameters/arguments.</param>
+            /// <returns>[string] Redirects and returns the StandardOutput into a single trimmed string (or, alternatively, the Exception as a string.)</returns>
+            public static string ExecuteCommand(string psCommand, Config.CustomProfiles.PowerShellProfile psProfile)
+            {
+                try
+                {
+                    string _command = Tools.PSCommandBuilder(psProfile.ExecutionPolicy, psCommand);
+                    Process _powershell = Tools.ProcessBuilder(ExePaths[psProfile.PSVersion], _command, psProfile.RunAsAdministrator);
+                    _powershell.Start();
+
+                    string _output = _powershell.StandardOutput.ReadToEnd();
+                    _powershell.WaitForExit();
+
+                    return _output.ToString().Trim();
+                }
+
+                catch (Exception ex)
+                {
+                    return "Error: " + ex.Message + Environment.NewLine + Environment.NewLine + "Exception: " + ex.ToString();
+                }
+            }
+
 
             /// <summary>
             /// Launches a PowerShell instance and asynchronously executes the specified command.
@@ -223,6 +288,32 @@ namespace Snippets
                 {
                     string _command = Tools.PSCommandBuilder(psPolicy, psCommand);
                     Process _powerShell = Tools.ProcessBuilder(ExePaths[psVersion], _command, psRunAsAdmin);
+                    _powerShell.Start();
+
+                    string _output = await _powerShell.StandardOutput.ReadToEndAsync();
+                    await _powerShell.WaitForExitAsync();
+
+                    return _output.ToString().Trim();
+                }
+
+                catch (Exception ex)
+                {
+                    return "Error: " + ex.Message + Environment.NewLine + Environment.NewLine + "Exception: " + ex.ToString();
+                }
+            }
+
+            /// <summary>
+            /// Launches a PowerShell instance using a Custom Profile and asynchronously executes the specified command.
+            /// </summary>
+            /// <param name="psCommand">The command to execute in the PowerShell instance.</param>
+            /// <param name="psProfile">The Custom Profile object containing predefined values for the required parameters/arguments.</param>
+            /// <returns>[string] Redirects and returns the StandardOutput into a single trimmed string (or, alternatively, the Exception as a string.)</returns>
+            public static async Task<string> ExecuteCommandAsync(string psCommand, Config.CustomProfiles.PowerShellProfile psProfile)
+            {
+                try
+                {
+                    string _command = Tools.PSCommandBuilder(psProfile.ExecutionPolicy, psCommand);
+                    Process _powerShell = Tools.ProcessBuilder(ExePaths[psProfile.PSVersion], _command, psProfile.RunAsAdministrator);
                     _powerShell.Start();
 
                     string _output = await _powerShell.StandardOutput.ReadToEndAsync();
