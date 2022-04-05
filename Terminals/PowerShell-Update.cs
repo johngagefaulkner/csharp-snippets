@@ -12,7 +12,7 @@ namespace Snippets
 {
     public class Terminals
     {
-        public class Tools
+        internal class Tools
         {
             internal static string? GetExecutionPolicyFromEnum(PowerShell.ExecutionPolicies _enum)
             {
@@ -47,7 +47,7 @@ namespace Snippets
             }
         }
 
-        private class StringEditor
+        internal class StringEditor
         {
             public enum ScriptChars
             {
@@ -56,7 +56,7 @@ namespace Snippets
                 Backtick = 2
             }
 
-            private static string GetScriptChar(ScriptChars _scriptChar)
+            internal static string GetScriptChar(ScriptChars _scriptChar)
             {
                 if (_scriptChar == ScriptChars.DoubleQuote)
                 {
