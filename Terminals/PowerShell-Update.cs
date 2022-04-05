@@ -33,7 +33,7 @@ namespace Snippets
             }
 
             internal static string PSCommandBuilder(PowerShell.ExecutionPolicies _executionPolicy, string _targetCommand)
-			{
+            {
                 string _policy = _executionPolicy.ToString().Trim();
                 string _command = $"-ExecutionPolicy {_policy} -NoProfile -NonInteractive -Command \"{_targetCommand}\"";
                 Console.WriteLine("[COMMAND] " + _command);
@@ -41,10 +41,10 @@ namespace Snippets
             }
 
             internal static string CMDCommandBuilder(string _targetCommand)
-			{
+            {
                 string _command = $"/c {_targetCommand}";
                 return _command;
-			}
+            }
         }
 
         private class StringEditor
@@ -89,12 +89,12 @@ namespace Snippets
             }
 
             public static string RemoveAllCharsFromScript(string inputScript)
-			{
+            {
                 string doubleQuotesRemoved = RemoveCharFromScript(inputScript, ScriptChars.DoubleQuote);
                 string singleQuotesRemoved = RemoveCharFromScript(doubleQuotesRemoved, ScriptChars.SingleQuote);
                 string backtickRemoved = RemoveCharFromScript(singleQuotesRemoved, ScriptChars.Backtick);
                 return backtickRemoved.Trim();
-			}
+            }
         }
 
         public class CMD
@@ -115,9 +115,9 @@ namespace Snippets
             /// <param name="runAsAdmin">Defines whether to use the verb "runas" when launching the process. Default: false.</param>
             /// <returns>[string] Redirects and returns the StandardOutput into a single trimmed string (or, alternatively, the Exception as a string.)</returns>
             public static string RunCommand(string cmdCommand, bool runAsAdmin = false)
-			{
+            {
                 try
-				{
+                {
                     string _command = Tools.CMDCommandBuilder(cmdCommand);
                     Process _cmd = Tools.ProcessBuilder(ExePath, _command, runAsAdmin);
                     _cmd.Start();
@@ -129,10 +129,10 @@ namespace Snippets
                 }
 
                 catch (Exception ex)
-				{
+                {
                     return "Error: " + ex.Message + Environment.NewLine + Environment.NewLine + "Exception: " + ex.ToString();
                 }
-			}
+            }
 
             /// <summary>
             /// Launches a Command Prompt (CMD) instance and asynchronously executes the specified command.
@@ -141,9 +141,9 @@ namespace Snippets
             /// <param name="runAsAdmin">Defines whether to use the verb "runas" when launching the process. Default: false.</param>
             /// <returns>[string] Redirects and returns the StandardOutput into a single trimmed string (or, alternatively, the Exception as a string.)</returns>
             public static async Task<string> RunCommandAsync(string cmdCommand, bool runAsAdmin = false)
-			{
+            {
                 try
-				{
+                {
                     string _command = Tools.CMDCommandBuilder(cmdCommand);
                     Process _cmd = Tools.ProcessBuilder(ExePath, _command, runAsAdmin);
                     _cmd.Start();
@@ -155,10 +155,10 @@ namespace Snippets
                 }
 
                 catch (Exception ex)
-				{
+                {
                     return "Error: " + ex.Message + Environment.NewLine + Environment.NewLine + "Exception: " + ex.ToString();
                 }
-			}
+            }
         }
 
         public class PowerShell
@@ -255,11 +255,11 @@ namespace Snippets
             public static string ExecutePS1(string filePath, bool psRunAsAdmin = false, ExecutionPolicies psPolicy = ExecutionPolicies.Default, PowerShellVersion psVersion = PowerShellVersion.WindowsPowerShell)
             {
                 try
-                {   
+                {
                     string cleansedPath = StringEditor.RemoveAllCharsFromScript(filePath);
                     string newPath = StringEditor.WrapScript(cleansedPath, StringEditor.ScriptChars.SingleQuote);
                     string _command = Tools.PSCommandBuilder(psPolicy, $"Invoke-Command -FilePath {newPath}");
-                    
+
                     Process _powerShell = Tools.ProcessBuilder(ExePaths[psVersion], _command, psRunAsAdmin);
                     _powerShell.Start();
 
