@@ -173,3 +173,29 @@ The results from the previous code sample would've shown something like the exam
   }
 ]
 ```
+
+---
+
+# Advanced Usage
+
+## Custom Profiles
+Some more advanced users, or users who plan to run a large number of PowerShell commands/scripts, may find it tedious being required to define the `Execution Policy` and `PowerShell Version` with each and every command. As an alternative, you can define `Custom Profiles` which already have those variables/parameters/arguments defined resulting in much cleaner code. You can create as many Custom Profiles as you'd like and re-use them as often as necessary.
+
+### Creating (and using) Custom Config Profiles
+
+Creating a Custom Profile is a simple, straight-forward, process. In the example below, I'm creating a Custom Profile for PowerShell 7 targeting the following settings:
+- **Executable Path:** `C:\Program Files\PowerShell\7\pwsh.exe`
+- **Run as Administrator:** `True`
+- **Execution Policy:** `Bypass`
+- **PowerShell Version:** `PowerShell7`
+
+**Example Code:**
+```csharp
+var ps7AdminProfile = Terminals.Config.CustomProfiles.PowerShellProfile.Create(@"C:\Program Files\PowerShell\7\pwsh.exe", true, Terminals.ExecutionPolicy.Bypass, Terminals.PSVersion.PowerShell7);
+```
+
+Creation of this profile enables us to now drastically reduce the code we write when we want to run a command/script using all the settings we defined above. For an easier comparison, we'll use the same "Storage Disks" code from the previous section. See the code example below:
+
+```csharp
+string diskResult = await Terminals.PowerShell.ExecuteCommandAsync(diskQuery, ps7AdminProfile);
+```
