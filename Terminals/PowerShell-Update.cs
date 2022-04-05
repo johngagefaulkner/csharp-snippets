@@ -104,7 +104,7 @@ namespace Snippets
             /// <summary>
             /// Launches a Command Prompt (CMD) instance and synchronously executes the specified command.
             /// </summary>
-            /// <param name="cmdCommand">The command to execute in the PowerShell instance.</param>
+            /// <param name="cmdCommand">The command to execute in the Command Prompt (CMD) instance.</param>
             /// <param name="runAsAdmin">Defines whether to use the verb "runas" when launching the process. Default: false.</param>
             /// <returns>[string] Redirects and returns the StandardOutput into a single trimmed string (or, alternatively, the Exception as a string.)</returns>
             public static string RunCommand(string cmdCommand, bool runAsAdmin = false)
@@ -130,7 +130,7 @@ namespace Snippets
             /// <summary>
             /// Launches a Command Prompt (CMD) instance and asynchronously executes the specified command.
             /// </summary>
-            /// <param name="cmdCommand">The command to execute in the PowerShell instance.</param>
+            /// <param name="cmdCommand">The command to execute in the Command Prompt (CMD) instance.</param>
             /// <param name="runAsAdmin">Defines whether to use the verb "runas" when launching the process. Default: false.</param>
             /// <returns>[string] Redirects and returns the StandardOutput into a single trimmed string (or, alternatively, the Exception as a string.)</returns>
             public static async Task<string> RunCommandAsync(string cmdCommand, bool runAsAdmin = false)
