@@ -12,9 +12,26 @@ namespace Snippets
 {
     public class Terminals
     {
+        public enum ExecutionPolicy
+        {
+            AllSigned = 0,
+            Bypass,
+            Default,
+            RemoteSigned,
+            Restricted,
+            Undefined,
+            Unrestricted
+        }
+
+        public enum PSVersion
+        {
+            WindowsPowerShell = 0,
+            PowerShell7 = 1
+        }
+
         internal class Tools
         {
-            internal static string? GetExecutionPolicyFromEnum(PowerShell.ExecutionPolicies _enum)
+            internal static string? GetExecutionPolicyFromEnum(Terminals.ExecutionPolicy _enum)
             {
                 return Enum.GetName(_enum);
             }
@@ -32,7 +49,7 @@ namespace Snippets
                 return _process;
             }
 
-            internal static string PSCommandBuilder(PowerShell.ExecutionPolicies _executionPolicy, string _targetCommand)
+            internal static string PSCommandBuilder(Terminals.ExecutionPolicy _executionPolicy, string _targetCommand)
             {
                 string _policy = _executionPolicy.ToString().Trim();
                 string _command = $"-ExecutionPolicy {_policy} -NoProfile -NonInteractive -Command \"{_targetCommand}\"";
@@ -156,28 +173,11 @@ namespace Snippets
 
         public class PowerShell
         {
-            private static Dictionary<PowerShellVersion, string> ExePaths = new()
+            private static Dictionary<PSVersion, string> ExePaths = new()
             {
-                { PowerShellVersion.WindowsPowerShell, Environment.GetFolderPath(Environment.SpecialFolder.System) + @"\WindowsPowerShell\v1.0\powershell.exe" },
-                { PowerShellVersion.PowerShell7, Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles) + @"\PowerShell\7\pwsh.exe" }
+                { PSVersion.WindowsPowerShell, Environment.GetFolderPath(Environment.SpecialFolder.System) + @"\WindowsPowerShell\v1.0\powershell.exe" },
+                { PSVersion.PowerShell7, Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles) + @"\PowerShell\7\pwsh.exe" }
             };
-
-            public enum ExecutionPolicies
-            {
-                AllSigned = 0,
-                Bypass,
-                Default,
-                RemoteSigned,
-                Restricted,
-                Undefined,
-                Unrestricted
-            }
-
-            public enum PowerShellVersion
-            {
-                WindowsPowerShell = 0,
-                PowerShell7 = 1
-            }
 
 
             /// <summary>
@@ -188,7 +188,7 @@ namespace Snippets
             /// <param name="psPolicy">The ExecutionPolicy assigned when launching the PowerShell instance. Default: Uses Windows default settings.</param>
             /// <param name="psVersion">Determines whether the command should be executed using Windows PowerShell (5.1) or PowerShell 7. Default: Windows PowerShell.</param>
             /// <returns>[string] Redirects and returns the StandardOutput into a single trimmed string (or, alternatively, the Exception as a string.)</returns>
-            public static string ExecuteCommand(string psCommand, bool psRunAsAdmin = false, ExecutionPolicies psPolicy = ExecutionPolicies.Default, PowerShellVersion psVersion = PowerShellVersion.WindowsPowerShell)
+            public static string ExecuteCommand(string psCommand, bool psRunAsAdmin = false, ExecutionPolicy psPolicy = ExecutionPolicy.Default, PSVersion psVersion = PSVersion.WindowsPowerShell)
             {
                 try
                 {
@@ -217,7 +217,7 @@ namespace Snippets
             /// <param name="psPolicy">The ExecutionPolicy assigned when launching the PowerShell instance. Default: Uses Windows default settings.</param>
             /// <param name="psVersion">Determines whether the command should be executed using Windows PowerShell (5.1) or PowerShell 7. Default: Windows PowerShell.</param>
             /// <returns>[string] Redirects and returns the StandardOutput into a single trimmed string (or, alternatively, the Exception as a string.)</returns>
-            public static async Task<string> ExecuteCommandAsync(string psCommand, bool psRunAsAdmin = false, ExecutionPolicies psPolicy = ExecutionPolicies.Default, PowerShellVersion psVersion = PowerShellVersion.WindowsPowerShell)
+            public static async Task<string> ExecuteCommandAsync(string psCommand, bool psRunAsAdmin = false, ExecutionPolicy psPolicy = ExecutionPolicy.Default, PSVersion psVersion = PSVersion.WindowsPowerShell)
             {
                 try
                 {
@@ -245,7 +245,7 @@ namespace Snippets
             /// <param name="psPolicy">The ExecutionPolicy assigned when launching the PowerShell instance. Default: Uses Windows default settings.</param>
             /// <param name="psVersion">Determines whether the command should be executed using Windows PowerShell (5.1) or PowerShell 7. Default: Windows PowerShell.</param>
             /// <returns>[string] Redirects and returns the StandardOutput into a single trimmed string (or, alternatively, the Exception as a string.)</returns>
-            public static string ExecutePS1(string filePath, bool psRunAsAdmin = false, ExecutionPolicies psPolicy = ExecutionPolicies.Default, PowerShellVersion psVersion = PowerShellVersion.WindowsPowerShell)
+            public static string ExecutePS1(string filePath, bool psRunAsAdmin = false, ExecutionPolicy psPolicy = ExecutionPolicy.Default, PSVersion psVersion = PSVersion.WindowsPowerShell)
             {
                 try
                 {
@@ -276,7 +276,7 @@ namespace Snippets
             /// <param name="psPolicy">The ExecutionPolicy assigned when launching the PowerShell instance. Default: Uses Windows default settings.</param>
             /// <param name="psVersion">Determines whether the command should be executed using Windows PowerShell (5.1) or PowerShell 7. Default: Windows PowerShell.</param>
             /// <returns>[string] Redirects and returns the StandardOutput into a single trimmed string (or, alternatively, the Exception as a string.)</returns>
-            public static async Task<string> ExecutePS1Async(string filePath, bool psRunAsAdmin = false, ExecutionPolicies psPolicy = ExecutionPolicies.Default, PowerShellVersion psVersion = PowerShellVersion.WindowsPowerShell)
+            public static async Task<string> ExecutePS1Async(string filePath, bool psRunAsAdmin = false, ExecutionPolicy psPolicy = ExecutionPolicy.Default, PSVersion psVersion = PSVersion.WindowsPowerShell)
             {
                 try
                 {
