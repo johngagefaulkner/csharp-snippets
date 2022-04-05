@@ -20,7 +20,7 @@ Snippets for running, calling, or otherwise interacting with, **Command Prompt (
             - **RunAsAdmin:** True/False (Default: False)
         - **PowerShell:**
             - **RunAsAdmin:** True/False (Default: False)
-            - **ExecutionPolicy:** All options supported (Default: Default)
+            - **ExecutionPolicy:** AllSigned, Bypass, Default, RemoteSigned, Restricted, Undefined, Unrestricted (Default: Default)
             - **PowerShellVersion:** Windows PowerShell or PowerShell 7
 
 ---
