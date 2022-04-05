@@ -197,9 +197,16 @@ var ps7AdminProfile = Terminals.Config.CustomProfiles.PowerShellProfile.Create(@
 Creation of this profile enables us to now reduce code written to run a command/script using all the settings we defined above. For an easier comparison, we'll use the same "Storage Disks" code from the previous section. See the code example below:
 
 ```csharp
-// Normal method of running a PowerShell Command
-string diskResult = await Terminals.PowerShell.ExecuteCommandAsync(diskQuery, true, Terminals.ExecutionPolicy.Bypass, Terminals.PSVersion.PowerShell7);
 
-// Shortened method using a Custom Profile with predefined settings
-string diskResult = await Terminals.PowerShell.ExecuteCommandAsync(diskQuery, ps7AdminProfile);
+public static async Task<string> GetStorageDiskInformation()
+{
+	// Build the PowerShell command
+	string diskQuery = "Get-PhysicalDisk | Select-Object BusType,MediaType,FriendlyName,Model,Manufacturer,FirmwareVersion |ConvertTo-Json -EnumsAsStrings";
+	
+	// Normal method of running a PowerShell Command
+	string diskResult = await Terminals.PowerShell.ExecuteCommandAsync(diskQuery, true, Terminals.ExecutionPolicy.Bypass, Terminals.PSVersion.PowerShell7);
+
+	// Shortened method using a Custom Profile with predefined settings
+	string diskResult2 = await Terminals.PowerShell.ExecuteCommandAsync(diskQuery, ps7AdminProfile);	
+}
 ```
