@@ -110,6 +110,24 @@ using Snippets.Terminals;
 
 namespace SnippetsWPF
 {
+    /// <summary>
+	/// Interaction logic for MainWindow.xaml
+	/// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
+        
+        // The event method that's automatically generated for "clicking" a button will NOT be 'async' - be sure to add it as seen below.
+        private async void button1_click(object sender, RoutedEventArgs e)
+        {
+            string storageDisks = await DeviceInformation.Storage.GetStorageDisks();
+            MessageBox.Show(storageDisks, "Storage Disks", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+    }
+    
     public class DeviceInformation
     {
         public class Storage
