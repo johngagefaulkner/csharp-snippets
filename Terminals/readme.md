@@ -1,5 +1,5 @@
 # C# Snippets • Terminals
-Snippets for running, calling, or otherwise interacting with, **Command Prompt (CMD)**, **Windows PowerShell**, and/or **PowerShell 7**, from `.NET 5` and `.NET 6`.
+Snippets for running, calling, or otherwise interacting with, **Command Prompt (CMD)**, **Windows PowerShell**, and/or **PowerShell 7**, from `.NET 6`.
 
 ---
 
