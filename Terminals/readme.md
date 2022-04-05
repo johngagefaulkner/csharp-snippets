@@ -1,5 +1,5 @@
 # C# Snippets • Terminals
-Snippets for running commands or scripts (files) with, **Command Prompt (CMD)**, **Windows PowerShell**, and/or **PowerShell 7**, in `.NET 6`.
+Snippets for running, calling, or otherwise interacting with, **Command Prompt (CMD)**, **Windows PowerShell**, and/or **PowerShell 7**, from `.NET 5` and `.NET 6`.
 
 ---
 
@@ -56,7 +56,7 @@ using Snippets; // Add to the top of your file.
 public static string GetInstalledAppxPackages()
 {
     string appxCommand = "Get-AppxPackage -AllUsers | Select-Object Name,Publisher,InstallLocation | ConvertTo-Json";
-    string _appxPackages = Terminals.PowerShell.ExecuteCommand(appxCommand, true, Terminals.PowerShell.ExecutionPolicies.Bypass, Terminals.PowerShell.PowerShellVersion.WindowsPowerShell);
+    string _appxPackages = Terminals.PowerShell.ExecuteCommand(appxCommand, true, Terminals.ExecutionPolicy.Bypass, Terminals.PSVersion.WindowsPowerShell);
     return _appxPackages.Trim();
 }
 ```
@@ -71,7 +71,7 @@ using Snippets.Terminals;
 public static async Task<string> GetAppxPackagesAsync()
 {
     string appxCommand = "Get-AppxPackage -AllUsers | Select-Object Name,Publisher,InstallLocation | ConvertTo-Json";
-    string _appxPackages = await Terminals.PowerShell.ExecuteCommandAsync(appxCommand, true, Terminals.PowerShell.ExecutionPolicies.Bypass, Terminals.PowerShell.PowerShellVersion.WindowsPowerShell);
+    string _appxPackages = await Terminals.PowerShell.ExecuteCommandAsync(appxCommand, true, Terminals.ExecutionPolicy.Bypass, Terminals.PSVersion.WindowsPowerShell);
     return _appxPackages.Trim();
 }
 ```
@@ -122,7 +122,7 @@ namespace SnippetsWPF
                 string diskQuery = "Get-PhysicalDisk | Select-Object BusType,MediaType,FriendlyName,Model,Manufacturer,FirmwareVersion |ConvertTo-Json -EnumsAsStrings";
 
                 // Run the command as an Administrator with ExecutionPolicy set to 'Bypass'
-                string diskResult = await Terminals.PowerShell.ExecuteCommandAsync(diskQuery, true, Terminals.PowerShell.ExecutionPolicies.Bypass, Terminals.PowerShell.PowerShellVersion.PowerShell7);
+                string diskResult = await Terminals.PowerShell.ExecuteCommandAsync(diskQuery, true, Terminals.ExecutionPolicy.Bypass, Terminals.PSVersion.PowerShell7);
 
                 // Return the result(s) from the script.
                 return diskResult;
