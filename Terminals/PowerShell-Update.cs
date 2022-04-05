@@ -6,297 +6,305 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Collections;
 
-namespace Snippets.Terminals
+namespace Snippets
 {
-	public class StringEditor
-	{
-		public static string AddQuotes(string inputStr, bool addSingleQuotesInstead = false)
-		{
-			if (addSingleQuotesInstead)
+    public class Terminals
+    {
+        public class Tools
+        {
+            internal static string? GetExecutionPolicyFromEnum(PowerShell.ExecutionPolicies _enum)
+            {
+                return Enum.GetName(_enum);
+            }
+
+            internal static Process ProcessBuilder(string _filePath, string _args, bool _runAsAdmin)
+            {
+                Process _process = new();
+                _process.StartInfo.UseShellExecute = false;
+                _process.StartInfo.RedirectStandardOutput = true;
+                _process.StartInfo.CreateNoWindow = true;
+                _process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                if (_runAsAdmin) { _process.StartInfo.Verb = "runas"; }
+                _process.StartInfo.FileName = _filePath;
+                _process.StartInfo.Arguments = _args;
+                return _process;
+            }
+
+            internal static string PSCommandBuilder(PowerShell.ExecutionPolicies _executionPolicy, string _targetCommand)
 			{
-				return "\"" + inputStr.Trim() + "\"";
+                string _policy = _executionPolicy.ToString().Trim();
+                string _command = $"-ExecutionPolicy {_policy} -NoProfile -NonInteractive -Command \"{_targetCommand}\"";
+                Console.WriteLine("[COMMAND] " + _command);
+                return _command;
+            }
+
+            internal static string CMDCommandBuilder(string _targetCommand)
+			{
+                string _command = $"/c {_targetCommand}";
+                return _command;
 			}
+        }
 
-			else
+        private class StringEditor
+        {
+            public enum ScriptChars
+            {
+                DoubleQuote = 0,
+                SingleQuote = 1,
+                Backtick = 2
+            }
+
+            private static string GetScriptChar(ScriptChars _scriptChar)
+            {
+                if (_scriptChar == ScriptChars.DoubleQuote)
+                {
+                    return "\"";
+                }
+                else if (_scriptChar == ScriptChars.SingleQuote)
+                {
+                    return "'";
+                }
+                else if (_scriptChar == ScriptChars.Backtick)
+                {
+                    return "`";
+                }
+                else
+                {
+                    throw new Exception("Invalid script char");
+                }
+            }
+
+            public static string WrapScript(string inputScript, ScriptChars scriptChar)
+            {
+                string scriptCharString = GetScriptChar(scriptChar);
+                return $"{scriptCharString}{inputScript}{scriptCharString}";
+            }
+
+            public static string RemoveCharFromScript(string inputScript, ScriptChars scriptChar)
+            {
+                string scriptCharString = GetScriptChar(scriptChar);
+                return inputScript.Replace(scriptCharString, "").Trim();
+            }
+
+            public static string RemoveAllCharsFromScript(string inputScript)
 			{
-				return "'" + inputStr.Trim() + "'";
+                string doubleQuotesRemoved = RemoveCharFromScript(inputScript, ScriptChars.DoubleQuote);
+                string singleQuotesRemoved = RemoveCharFromScript(doubleQuotesRemoved, ScriptChars.SingleQuote);
+                string backtickRemoved = RemoveCharFromScript(singleQuotesRemoved, ScriptChars.Backtick);
+                return backtickRemoved.Trim();
 			}
-		}
+        }
 
-		public static string RemoveQuotes(string inputStr, bool removeSingleAndDoubleQuotes = false)
-		{
-			if (removeSingleAndDoubleQuotes)
+        public class CMD
+        {
+            /* Attempting to keep this code as simple as possible, this class exposes only 2 methods. 
+           *  - [1: RunCommand] Synchronously launches a Command Prompt (CMD.exe) instance and executes the command passed-through as an argument. Returns the redirected StandardOutput.
+           *  - [2: RunCommandAsync] Asynchronously launches a Command Prompt (CMD.exe) instance and executes the command passed-through as an argument. Awaits then returns the redirected StandardOutput.
+           * Default params were purposely kept basic, feel free to expand as needed.
+           * - [0: userScript] The command or script to execute.
+           */
+
+            private static string ExePath = Environment.GetFolderPath(Environment.SpecialFolder.System) + @"\cmd.exe";
+
+            /// <summary>
+            /// Launches a Command Prompt (CMD) instance and synchronously executes the specified command.
+            /// </summary>
+            /// <param name="cmdCommand">The command to execute in the PowerShell instance.</param>
+            /// <param name="runAsAdmin">Defines whether to use the verb "runas" when launching the process. Default: false.</param>
+            /// <returns>[string] Redirects and returns the StandardOutput into a single trimmed string (or, alternatively, the Exception as a string.)</returns>
+            public static string RunCommand(string cmdCommand, bool runAsAdmin = false)
 			{
-				string inputWithoutDoubleQuotes = inputStr.Replace("\"", "");
-				return inputWithoutDoubleQuotes.Replace("'", "").Trim();
-			}
-
-			else
-			{
-				return inputStr.Replace("\"", "").Trim();
-			}
-		}
-	}
-
-	public class ExeFinder
-	{
-		public static Dictionary<PowerShell.PowerShellVersion, string> GetPowerShellPaths()
-		{
-			try
-			{
-				Dictionary<PowerShell.PowerShellVersion, string> _result = new();
-
-				//%SystemRoot%\system32\WindowsPowerShell\v1.0\
-				string systemRoot = Environment.GetFolderPath(Environment.SpecialFolder.System);
-				string winPsExe = System.IO.Path.Combine(systemRoot, "WindowsPowerShell", "v1.0", "powershell.exe");
-				if (File.Exists(winPsExe))
+                try
 				{
-					_result.Add(PowerShell.PowerShellVersion.WindowsPowerShell, Path.GetFullPath(winPsExe));
-				}
+                    string _command = Tools.CMDCommandBuilder(cmdCommand);
+                    Process _cmd = Tools.ProcessBuilder(ExePath, _command, runAsAdmin);
+                    _cmd.Start();
 
-				// "C:\Program Files\PowerShell\7\pwsh.exe"
-				// "C:\Program Files\PowerShell\7\pwsh.exe" -WorkingDirectory ~
-				string programFilesDir = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-				string ps7Exe = Path.Combine(programFilesDir, "PowerShell", "7", "pwsh.exe");
-				if (File.Exists(ps7Exe))
+                    string _output = _cmd.StandardOutput.ReadToEnd();
+                    _cmd.WaitForExit();
+
+                    return _output.ToString().Trim();
+                }
+
+                catch (Exception ex)
 				{
-					_result.Add(PowerShell.PowerShellVersion.PowerShell7, Path.GetFullPath(ps7Exe));
-				}
+                    return "Error: " + ex.Message + Environment.NewLine + Environment.NewLine + "Exception: " + ex.ToString();
+                }
+			}
 
-				// Determine whether dictionary was populated
-				if (_result.Count == 0)
+            /// <summary>
+            /// Launches a Command Prompt (CMD) instance and asynchronously executes the specified command.
+            /// </summary>
+            /// <param name="cmdCommand">The command to execute in the PowerShell instance.</param>
+            /// <param name="runAsAdmin">Defines whether to use the verb "runas" when launching the process. Default: false.</param>
+            /// <returns>[string] Redirects and returns the StandardOutput into a single trimmed string (or, alternatively, the Exception as a string.)</returns>
+            public static async Task<string> RunCommandAsync(string cmdCommand, bool runAsAdmin = false)
+			{
+                try
 				{
-					return null;
-				}
+                    string _command = Tools.CMDCommandBuilder(cmdCommand);
+                    Process _cmd = Tools.ProcessBuilder(ExePath, _command, runAsAdmin);
+                    _cmd.Start();
 
-				return _result;
-			}
+                    string _output = await _cmd.StandardOutput.ReadToEndAsync();
+                    await _cmd.WaitForExitAsync();
 
-			catch (Exception ex)
-			{
-				Console.WriteLine("Error: " + ex.Message);
-				return null;
-			}
-		}
-	}
+                    return _output.ToString().Trim();
+                }
 
-	public class PowerShell
-	{
-		/* Attempting to keep this code as simple as possible, this class exposes only 4 methods. 
-         *  - [1: ExecuteCommand] Synchronously launches a  PowerShell (powershell.exe) instance and executes the command passed-through as an argument. Returns the redirected StandardOutput.
-         *  - [2: ExecuteCommandAsync] Asynchronously launches a PowerShell (powershell.exe) instance and executes the command passed-through as an argument. Awaits then returns the redirected StandardOutput.
-         * - Pending
-         * - Pending
-         * Default params were purposely kept basic, feel free to expand as needed.
-         * - [0: psCommand] The command or script to execute in the PowerShell instance.
-         * - [1: psPolicy] The ExecutionPolicy assigned when launching the PowerShell instance. Default: Bypass.
-         * - [2: psPath] The full path to the PowerShell executable. Useful if targeting specific versions. Default: powershell.exe
-        */
-
-		public enum ExecutionPolicies
-		{
-			AllSigned = 0,
-			Bypass,
-			Default,
-			RemoteSigned,
-			Restricted,
-			Undefined,
-			Unrestricted
-		}
-
-		public enum PowerShellVersion
-		{
-			WindowsPowerShell = 0,
-			PowerShell7
-		}
-
-		private static bool IsPowerShellFound()
-		{
-			try
-			{
-				if (PowerShellExePaths == null)
+                catch (Exception ex)
 				{
-					var myPaths = ExeFinder.GetPowerShellPaths();
-
-					if (myPaths == null)
-					{
-						return false;
-					}
-
-					else
-					{
-						PowerShellExePaths = myPaths;
-						return true;
-					}
-				}
-
-				else
-				{
-					return true;
-				}
+                    return "Error: " + ex.Message + Environment.NewLine + Environment.NewLine + "Exception: " + ex.ToString();
+                }
 			}
+        }
 
-			catch (Exception ex)
-			{
-				return false;
-			}
-		}
+        public class PowerShell
+        {
+            private static Dictionary<PowerShellVersion, string> ExePaths = new()
+            {
+                { PowerShellVersion.WindowsPowerShell, Environment.GetFolderPath(Environment.SpecialFolder.System) + @"\WindowsPowerShell\v1.0\powershell.exe" },
+                { PowerShellVersion.PowerShell7, Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles) + @"\PowerShell\7\pwsh.exe" }
+            };
 
-		public static Dictionary<PowerShellVersion, string> PowerShellExePaths { get; set; } = null;
+            public enum ExecutionPolicies
+            {
+                AllSigned = 0,
+                Bypass,
+                Default,
+                RemoteSigned,
+                Restricted,
+                Undefined,
+                Unrestricted
+            }
 
-		/// <summary>
-		/// Launches a PowerShell instance and executes the specified command or script.
-		/// </summary>
-		/// <param name="psCommand">The command or script to execute in the PowerShell instance.</param>
-		/// <param name="psPolicy">The ExecutionPolicy assigned when launching the PowerShell instance. Default: Bypass.</param>
-		/// <param name="psPath">The full path to the PowerShell executable. Useful if targeting specific versions. Default: powershell.exe</param>
-		/// <returns>[string] Redirects and returns the StandardOutput into a single trimmed string (or, alternatively, the Exception as a string.)</returns>
-		public static string ExecuteCommand(string psCommand, ExecutionPolicies psPolicy = ExecutionPolicies.Bypass, PowerShellVersion psVersion = PowerShellVersion.WindowsPowerShell)
-		{
-			try
-			{
-				if (IsPowerShellFound() == false)
-				{
-					return "PowerShell could not be found on this system. Please submit an issue on GitHub!";
-				}
+            public enum PowerShellVersion
+            {
+                WindowsPowerShell = 0,
+                PowerShell7 = 1
+            }
 
-				string _policy = psPolicy.ToString().Trim();
 
-				Process _powerShell = new Process();
-				_powerShell.StartInfo.UseShellExecute = false;
-				_powerShell.StartInfo.RedirectStandardOutput = true;
-				_powerShell.StartInfo.CreateNoWindow = true;
-				_powerShell.StartInfo.Verb = "runas";
-				_powerShell.StartInfo.FileName = PowerShellExePaths[psVersion];
-				_powerShell.StartInfo.Arguments = $"-NoProfile -ExecutionPolicy {_policy} -NoLogo -Command {psCommand}";
-				_powerShell.Start();
+            /// <summary>
+            /// Launches a PowerShell instance and synchronously executes the specified command.
+            /// </summary>
+            /// <param name="psCommand">The command to execute in the PowerShell instance.</param>
+            /// <param name="psRunAsAdmin">Defines whether to use the verb "runas" when launching the process. Default: false.</param>
+            /// <param name="psPolicy">The ExecutionPolicy assigned when launching the PowerShell instance. Default: Uses Windows default settings.</param>
+            /// <param name="psVersion">Determines whether the command should be executed using Windows PowerShell (5.1) or PowerShell 7. Default: Windows PowerShell.</param>
+            /// <returns>[string] Redirects and returns the StandardOutput into a single trimmed string (or, alternatively, the Exception as a string.)</returns>
+            public static string ExecuteCommand(string psCommand, bool psRunAsAdmin = false, ExecutionPolicies psPolicy = ExecutionPolicies.Default, PowerShellVersion psVersion = PowerShellVersion.WindowsPowerShell)
+            {
+                try
+                {
+                    string _command = Tools.PSCommandBuilder(psPolicy, psCommand);
+                    Process _powerShell = Tools.ProcessBuilder(ExePaths[psVersion], _command, psRunAsAdmin);
+                    _powerShell.Start();
 
-				string _output = _powerShell.StandardOutput.ReadToEnd();
-				_powerShell.WaitForExit();
+                    string _output = _powerShell.StandardOutput.ReadToEnd();
+                    _powerShell.WaitForExit();
 
-				return _output.ToString().Trim();
-			}
+                    return _output.ToString().Trim();
+                }
 
-			catch (Exception ex)
-			{
-				return "Error: " + ex.Message;
-			}
-		}
+                catch (Exception ex)
+                {
+                    return "Error: " + ex.Message + Environment.NewLine + Environment.NewLine + "Exception: " + ex.ToString();
+                }
+            }
 
-		/// <summary>
-		/// Asynchronously launches a PowerShell instance and executes the specified command or script.
-		/// </summary>
-		/// <param name="psCommand">The command or script to execute in the PowerShell instance.</param>
-		/// <param name="psPolicy">The ExecutionPolicy assigned when launching the PowerShell instance. Default: Bypass.</param>
-		/// <param name="psPath">The full path to the PowerShell executable. Useful if targeting specific versions. Default: powershell.exe</param>
-		/// <returns>[string] Redirects and returns the StandardOutput into a single trimmed string (or, alternatively, the Exception as a string.)</returns>
-		public static async Task<string> ExecuteCommandAsync(string psCommand, ExecutionPolicies psPolicy = ExecutionPolicies.Bypass, PowerShellVersion psVersion = PowerShellVersion.WindowsPowerShell)
-		{
-			try
-			{
-				if (IsPowerShellFound() == false)
-				{
-					return "PowerShell could not be found on this system. Please submit an issue on GitHub!";
-				}
 
-				string _policy = psPolicy.ToString().Trim();
+            /// <summary>
+            /// Launches a PowerShell instance and asynchronously executes the specified command.
+            /// </summary>
+            /// <param name="psCommand">The command to execute in the PowerShell instance.</param>
+            /// <param name="psRunAsAdmin">Defines whether to use the verb "runas" when launching the process. Default: false.</param>
+            /// <param name="psPolicy">The ExecutionPolicy assigned when launching the PowerShell instance. Default: Uses Windows default settings.</param>
+            /// <param name="psVersion">Determines whether the command should be executed using Windows PowerShell (5.1) or PowerShell 7. Default: Windows PowerShell.</param>
+            /// <returns>[string] Redirects and returns the StandardOutput into a single trimmed string (or, alternatively, the Exception as a string.)</returns>
+            public static async Task<string> ExecuteCommandAsync(string psCommand, bool psRunAsAdmin = false, ExecutionPolicies psPolicy = ExecutionPolicies.Default, PowerShellVersion psVersion = PowerShellVersion.WindowsPowerShell)
+            {
+                try
+                {
+                    string _command = Tools.PSCommandBuilder(psPolicy, psCommand);
+                    Process _powerShell = Tools.ProcessBuilder(ExePaths[psVersion], _command, psRunAsAdmin);
+                    _powerShell.Start();
 
-				Process _powerShell = new Process();
-				_powerShell.StartInfo.UseShellExecute = false;
-				_powerShell.StartInfo.RedirectStandardOutput = true;
-				_powerShell.StartInfo.CreateNoWindow = true;
-				_powerShell.StartInfo.Verb = "runas";
-				_powerShell.StartInfo.FileName = PowerShellExePaths[psVersion];
-				_powerShell.StartInfo.Arguments = $"-NoProfile -ExecutionPolicy {_policy} -NoLogo -Command {psCommand}";
-				_powerShell.Start();
+                    string _output = await _powerShell.StandardOutput.ReadToEndAsync();
+                    await _powerShell.WaitForExitAsync();
 
-				string _output = await _powerShell.StandardOutput.ReadToEndAsync();
-				await _powerShell.WaitForExitAsync();
+                    return _output.ToString().Trim();
+                }
 
-				return _output.ToString().Trim();
-			}
+                catch (Exception ex)
+                {
+                    return "Error: " + ex.Message + Environment.NewLine + Environment.NewLine + "Exception: " + ex.ToString();
+                }
+            }
 
-			catch (Exception ex)
-			{
-				return "Error: " + ex.Message;
-			}
-		}
+            /// <summary>
+            /// Launches a PowerShell instance and synchronously executes the script located at the provided file path.
+            /// </summary>
+            /// <param name="filePath">Full path to the .ps1 script.</param>
+            /// <param name="psRunAsAdmin">Defines whether to use the verb "runas" when launching the process. Default: false.</param>
+            /// <param name="psPolicy">The ExecutionPolicy assigned when launching the PowerShell instance. Default: Uses Windows default settings.</param>
+            /// <param name="psVersion">Determines whether the command should be executed using Windows PowerShell (5.1) or PowerShell 7. Default: Windows PowerShell.</param>
+            /// <returns>[string] Redirects and returns the StandardOutput into a single trimmed string (or, alternatively, the Exception as a string.)</returns>
+            public static string ExecutePS1(string filePath, bool psRunAsAdmin = false, ExecutionPolicies psPolicy = ExecutionPolicies.Default, PowerShellVersion psVersion = PowerShellVersion.WindowsPowerShell)
+            {
+                try
+                {   
+                    string cleansedPath = StringEditor.RemoveAllCharsFromScript(filePath);
+                    string newPath = StringEditor.WrapScript(cleansedPath, StringEditor.ScriptChars.SingleQuote);
+                    string _command = Tools.PSCommandBuilder(psPolicy, $"Invoke-Command -FilePath {newPath}");
+                    
+                    Process _powerShell = Tools.ProcessBuilder(ExePaths[psVersion], _command, psRunAsAdmin);
+                    _powerShell.Start();
 
-		/// <summary>
-		/// Synchronously launches a PowerShell instance and executes the script located at the provided file path.
-		/// </summary>
-		/// <param name="filePath">Full path to the .ps1 script.</param>
-		/// <returns>[string] Redirects and returns the StandardOutput into a single trimmed string (or, alternatively, the Exception as a string.)</returns>
-		public static string ExecutePS1(string filePath, PowerShellVersion psVersion = PowerShellVersion.WindowsPowerShell)
-		{
-			try
-			{
-				if (IsPowerShellFound() == false)
-				{
-					return "PowerShell could not be found on this system. Please submit an issue on GitHub!";
-				}
+                    string _output = _powerShell.StandardOutput.ReadToEnd();
+                    _powerShell.WaitForExit();
 
-				string cleansedPath = StringEditor.RemoveQuotes(filePath, true);
-				string psCommand = "Invoke-Command -FilePath " + StringEditor.AddQuotes(cleansedPath, true);
+                    return _output.ToString().Trim();
+                }
 
-				Process _powerShell = new Process();
-				_powerShell.StartInfo.UseShellExecute = false;
-				_powerShell.StartInfo.RedirectStandardOutput = true;
-				_powerShell.StartInfo.CreateNoWindow = true;
-				_powerShell.StartInfo.Verb = "runas";
-				_powerShell.StartInfo.FileName = PowerShellExePaths[psVersion];
-				_powerShell.StartInfo.Arguments = $"-NoProfile -ExecutionPolicy Bypass -NoLogo -Command {psCommand}";
-				_powerShell.Start();
+                catch (Exception ex)
+                {
+                    return "Error: " + ex.Message + Environment.NewLine + Environment.NewLine + "Exception: " + ex.ToString();
+                }
+            }
 
-				string _output = _powerShell.StandardOutput.ReadToEnd();
-				_powerShell.WaitForExit();
+            /// <summary>
+            /// Launches a PowerShell instance and asynchronously executes the script located at the provided file path.
+            /// </summary>
+            /// <param name="filePath">Full path to the .ps1 script.</param>
+            /// <param name="psRunAsAdmin">Defines whether to use the verb "runas" when launching the process. Default: false.</param>
+            /// <param name="psPolicy">The ExecutionPolicy assigned when launching the PowerShell instance. Default: Uses Windows default settings.</param>
+            /// <param name="psVersion">Determines whether the command should be executed using Windows PowerShell (5.1) or PowerShell 7. Default: Windows PowerShell.</param>
+            /// <returns>[string] Redirects and returns the StandardOutput into a single trimmed string (or, alternatively, the Exception as a string.)</returns>
+            public static async Task<string> ExecutePS1Async(string filePath, bool psRunAsAdmin = false, ExecutionPolicies psPolicy = ExecutionPolicies.Default, PowerShellVersion psVersion = PowerShellVersion.WindowsPowerShell)
+            {
+                try
+                {
+                    string cleansedPath = StringEditor.RemoveAllCharsFromScript(filePath);
+                    string newPath = StringEditor.WrapScript(cleansedPath, StringEditor.ScriptChars.SingleQuote);
+                    string _command = Tools.PSCommandBuilder(psPolicy, $"Invoke-Command -FilePath {newPath}");
 
-				return _output.ToString().Trim();
-			}
+                    Process _powerShell = Tools.ProcessBuilder(ExePaths[psVersion], _command, psRunAsAdmin);
+                    _powerShell.Start();
 
-			catch (Exception ex)
-			{
-				return "Error: " + ex.Message;
-			}
-		}
+                    string _output = await _powerShell.StandardOutput.ReadToEndAsync();
+                    await _powerShell.WaitForExitAsync();
 
-		/// <summary>
-		/// Asynchronously launches a PowerShell instance and executes the script located at the provided file path.
-		/// </summary>
-		/// <param name="filePath">Full path to the .ps1 script.</param>
-		/// <returns>[string] Redirects and returns the StandardOutput into a single trimmed string (or, alternatively, the Exception as a string.)</returns>
-		public static async Task<string> ExecutePS1Async(string filePath, PowerShellVersion psVersion = PowerShellVersion.WindowsPowerShell)
-		{
-			try
-			{
-				if (IsPowerShellFound() == false)
-				{
-					return "PowerShell could not be found on this system. Please submit an issue on GitHub!";
-				}
+                    return _output.ToString().Trim();
+                }
 
-				string cleansedPath = StringEditor.RemoveQuotes(filePath, true);
-				string psCommand = "Invoke-Command -FilePath " + StringEditor.AddQuotes(cleansedPath, true);
-
-				Process _powerShell = new Process();
-				_powerShell.StartInfo.UseShellExecute = false;
-				_powerShell.StartInfo.RedirectStandardOutput = true;
-				_powerShell.StartInfo.CreateNoWindow = true;
-				_powerShell.StartInfo.Verb = "runas";
-				_powerShell.StartInfo.FileName = PowerShellExePaths[psVersion];
-				_powerShell.StartInfo.Arguments = $"-NoProfile -ExecutionPolicy Bypass -NoLogo -Command {psCommand}";
-				_powerShell.Start();
-
-				string _output = await _powerShell.StandardOutput.ReadToEndAsync();
-				await _powerShell.WaitForExitAsync();
-
-				return _output.ToString().Trim();
-			}
-
-			catch (Exception ex)
-			{
-				return "Error: " + ex.Message;
-			}
-		}
-	}
+                catch (Exception ex)
+                {
+                    return "Error: " + ex.Message + Environment.NewLine + Environment.NewLine + "Exception: " + ex.ToString();
+                }
+            }
+        }
+    }
 }
