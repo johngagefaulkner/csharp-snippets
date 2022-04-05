@@ -149,3 +149,27 @@ namespace SnippetsWPF
     }
 }
 ```
+
+### Example Output
+The results from the previous code sample would've shown something like the example below in a MessageBox:
+
+```json
+[
+  {
+    "BusType": "NVMe",
+    "MediaType": "SSD",
+    "FriendlyName": "INTEL SSDPEKNW010T8",
+    "Model": "INTEL SSDPEKNW010T8",
+    "Manufacturer": null,
+    "FirmwareVersion": "004C"
+  },
+  {
+    "BusType": "NVMe",
+    "MediaType": "SSD",
+    "FriendlyName": "NVMe Samsung SSD 970",
+    "Model": "Samsung SSD 970",
+    "Manufacturer": "NVMe",
+    "FirmwareVersion": "1B2QEXP7"
+  }
+]
+```
