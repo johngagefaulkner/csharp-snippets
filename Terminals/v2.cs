@@ -1,5 +1,8 @@
 using System;
+using System.IO;
 using System.Diagnostics;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace Snippets
 {
@@ -20,26 +23,31 @@ namespace Snippets
                 public static string SystemRootPath = Environment.GetFolderPath(Environment.SpecialFolder.System);
                 public static string WindowsDirectoryPath = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
 
-                public static string CMD = SystemRootPath + @"\cmd.exe";
-                public static string WindowsPowerShell = SystemRootPath + @"\WindowsPowerShell\v1.0\powershell.exe";
-                public static string PowerShell7 = ProgramFilesPath + @"\PowerShell\7\pwsh.exe";
+                public static string CMD = System.IO.Path.Combine(SystemRootPath, @"\cmd.exe");
+                public static string WindowsPowerShell = System.IO.Path.Combine(SystemRootPath, @"\WindowsPowerShell\v1.0\powershell.exe");
+                public static string PowerShell7 = System.IO.Path.Combine(ProgramFilesPath, @"\PowerShell\7\pwsh.exe");
+
+                public static Dictionary<Shells, string> ShellPaths = new Dictionary<Shells, string>()
+                {
+                    { Shells.CMD, Paths.CMD },
+                    { Shells.WindowsPowerShell, Paths.WindowsPowerShell },
+                    { Shells.PowerShell7, Paths.PowerShell7 },
+                };
 
                 public static string GetShellPath(Shells _shell)
                 {
-                    string[] _paths = new[] { Paths.CMD, Paths.WindowsPowerShell, Paths.PowerShell7 };
-                    string pathResult = _paths[(int)_shell];
-                    return pathResult;
+                    return ShellPaths[_shell];
                 }
             }
         }
 
-        private static Process? ProcessBuilder(string _command, Shells _shell, bool _runAsAdmin)
+        private static Process ProcessBuilder(string _command, Shells _shell, bool _runAsAdmin)
         {
             try
             {
                 string shellPath = Config.Paths.GetShellPath(_shell);
 
-                Process _proc = new();
+                Process _proc = new Process();
                 _proc.StartInfo.UseShellExecute = false;
                 _proc.StartInfo.RedirectStandardOutput = true;
                 _proc.StartInfo.CreateNoWindow = true;
