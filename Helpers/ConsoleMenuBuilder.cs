@@ -5,6 +5,7 @@ namespace Snippets.Helpers
     public class ConsoleMenuBuilder
     {
 
+// It should be very simple to convert this into a method that accepts an array of strings as menu items/options, a Boolean whether to automatically generate an "exit" option, then returns a string or an int depending on the user's choice.  
    if (Bootstrap.TryInitialize(majorMinorVersion, out result))
             {
                 int choice = 0;
