@@ -4,6 +4,8 @@ Snippets related to WinUI 3 go here.
 
 ## Fix Caption Buttons with Custom Titlebar
 
+After setting `ExtendsContentIntoTitlebar` to `true` and calling `SetTitleBar()` in your MainWindow class, your Caption buttons won't properly display the content behind them. In your `App.xaml` file, add the 2 lines from the sample code below to fix it!
+
 ```xml
 <Application
     x:Class="Snippets.App"
