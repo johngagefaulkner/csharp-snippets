@@ -25,7 +25,7 @@ Version 1.3 also *dramatically* reduced the amount of boilerplate and duplicate 
 
 ```csharp
 // You're now able to use AppWindow APIs directly from an Window through Window.AppWindow. 
-using Microsoft.UI.Xaml.Windowing;
+public static Microsoft.UI.Windowing.AppWindow m_AppWindow;
 
 public MainWindow()
 {
@@ -34,3 +34,9 @@ public MainWindow()
   this.AppWindow.Title = ""; // Perform actions directly on AppWindow
 }
 ```
+
+**AppWindow Information:**
+
+- For the Windows App SDK version of Microsoft.UI.Windowing.AppWindow we're supporting only top-level HWNDs. There's a 1:1 mapping between an AppWindow and a top-level HWND.
+- The lifetime of an AppWindow object and an HWND is the same—the AppWindow is available immediately after the window has been created; and it's destroyed when the window is closed.
+- AppWindow is available only to desktop apps (both packaged and unpackaged); it's not available to UWP apps.
