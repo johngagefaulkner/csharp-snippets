@@ -1,0 +1,37 @@
+using System;
+using System.IO;
+using System.Diagnostics;
+using System.Linq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Text;
+using System.Windows;
+
+namespace Snippets.Helpers;
+
+public static class EnvHelper
+{
+  // Returns the full path to the LocalAppData folder for the currently signed-in user.
+  public static string LocalApplicationDataFolder()
+  {
+      WindowsIdentity currentUser = WindowsIdentity.GetCurrent();
+      SecurityIdentifier currentUserSID = currentUser.User;
+
+      SecurityIdentifier localSystemSID = new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null);
+      if (currentUserSID.Equals(localSystemSID) && UserLocalAppDataPath != string.Empty)
+      {
+          return UserLocalAppDataPath;
+      }
+      else
+      {
+          return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+      }
+  }
+
+  // Returns the full path to the running instance of the app.
+  public static string GetCurrentAppInstallationFolder()
+  {
+      var settingsPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+      return Directory.GetParent(settingsPath).FullName;
+  }
+}
