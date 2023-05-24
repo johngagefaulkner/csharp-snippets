@@ -35,6 +35,7 @@ public static class EnvHelper
       return Directory.GetParent(settingsPath).FullName;
   }
   
+  // Launches an exe that's stored in the same folder as the running instance of your app.
   public static void LaunchLocalExeWithArgs(string exeName, string _args)
   {
       try
