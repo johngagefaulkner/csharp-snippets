@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO.Abstractions;
 
-namespace Snippets.Services.LogClient
+namespace Snippets.Services.Logging
 {
     public static class LoggerAlt
     {
