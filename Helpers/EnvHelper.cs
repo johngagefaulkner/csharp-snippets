@@ -11,6 +11,12 @@ namespace Snippets.Helpers;
 
 public static class EnvHelper
 {
+  // Determines whether the currently running Operating System is Windows 11
+  public static bool Windows11()
+  {
+      return Environment.OSVersion.Version.Major >= 10 && Environment.OSVersion.Version.Build >= 22000;
+  }
+
   // Returns the full path to the LocalAppData folder for the currently signed-in user.
   public static string LocalApplicationDataFolder()
   {
