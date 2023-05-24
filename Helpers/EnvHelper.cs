@@ -34,4 +34,17 @@ public static class EnvHelper
       var settingsPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
       return Directory.GetParent(settingsPath).FullName;
   }
+  
+  public static void LaunchLocalExeWithArgs(string exeName, string _args)
+  {
+      try
+      {
+          var targetAppPath = System.IO.Path.Combine(GetCurrentAppInstallationFolder(), exeName);
+          Process.Start(new ProcessStartInfo(targetAppPath) { Arguments = $"{_args}" });
+      }
+      catch
+      {
+          // TODO(stefan): Log exception once unified logging is implemented
+      }
+  }
 }
