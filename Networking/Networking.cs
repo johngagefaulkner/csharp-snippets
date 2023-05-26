@@ -4,20 +4,24 @@ namespace Snippets
 {
     public partial class Networking
     {
-		public static async Task<(bool, string)> IsIPAddressReachable(string ipAddress) // Tuple allows more values in output, Async allows not locking UI thread
-		{
-			try
-			{
-				using (var ping = new Ping()) // "using" statement ensures correct use of IDisposable objects
-				{
-					var checkPing = await ping.SendPingAsync(ipAddress);
-					return checkPing.Status == IPStatus.Success ? (true, checkPing.Status.ToString()) : (false, checkPing.Status.ToString());
-				}
-			}
-			catch(Exception ex)
-			{
-				return (false, ex.Message) ;
-			}
-		}
+		// Tuple allows more values in output, Async allows not locking UI thread
+        public static async Task<(bool, string)> IsIPAddressReachable(string ipAddress)
+        {
+            using (var ping = new Ping()) // The "using" statement ensures correct use of IDisposable objects
+            {
+                try
+                {
+                    var checkPing = await ping.SendPingAsync(ipAddress);
+
+                    if (checkPing.Status == IPStatus.Success) return (true, checkPing.Status.ToString());
+                    else return (false, checkPing.Status.ToString());
+                }
+
+                catch (Exception ex)
+                {
+                    return (false, ex.Message);
+                }
+            }
+        }
     }
 }
