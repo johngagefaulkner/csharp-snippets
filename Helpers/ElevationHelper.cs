@@ -1,16 +1,7 @@
-using System.Security.Principal;
-
 namespace Snippets.Helpers
 {
-    public class ElevationHelper
+    public partial class ElevationHelper
     {
-        private readonly bool _isElevated;
-
-        public bool IsElevated => _isElevated;
-
-        public ElevationHelper()
-        {
-            _isElevated = new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
-        }
+        public static bool IsCurrentProcessElevated() => new System.Security.Principal.WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
     }
 }
