@@ -4,6 +4,14 @@ This is in reference to the CLI for https://app.quicktype.io/. Install using `np
 
 ---
 
+## Examples
+
+```js
+quicktype "input.json" -o "Output.cs" -l cs -s json --no-maps --no-enums --no-uuids --no-date-times --no-combine-classes --alphabetize-properties
+```
+
+---
+
 ## Help Document
 
 - `-o, --out`
