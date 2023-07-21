@@ -4,6 +4,12 @@ namespace Snippets
 {
     public static class Networking
     {
+        private static bool GetBoolFromPingStatus(IPStatus status) => status switch
+        {
+            IPStatus.Success => true,
+            _ => false
+        };
+
         // A Tuple allows us to have more values in output
         public static (bool, string) SendPing(string ipAddress)
         {
@@ -13,7 +19,7 @@ namespace Snippets
                 try
                 {
                     var checkPing = ping.Send(ipAddress);
-                    return (IPStatus.Success, checkPing.Status.ToString());
+                    return (GetBoolFromPingStatus(checkPing.Status), checkPing.Status.ToString());
                 }
                 catch (Exception ex) { return (false, ex.Message); }
             }
@@ -27,7 +33,7 @@ namespace Snippets
                 try
                 {
                     var checkPing = await ping.SendPingAsync(ipAddress);
-                    return (IPStatus.Success, checkPing.Status.ToString());
+                    return (GetBoolFromPingStatus(checkPing.Status), checkPing.Status.ToString());
                 }
 
                 catch (Exception ex) { return (false, ex.Message); }
