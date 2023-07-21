@@ -26,8 +26,8 @@ namespace Snippets
             {
                 try
                 {
-			var checkPing = await ping.SendPingAsync(ipAddress);
- 			return (IPStatus.Success, checkPing.Status.ToString());
+                    var checkPing = await ping.SendPingAsync(ipAddress);
+                    return (IPStatus.Success, checkPing.Status.ToString());
                 }
 
                 catch (Exception ex) { return (false, ex.Message); }
