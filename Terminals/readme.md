@@ -1,11 +1,17 @@
 # C# Snippets • Terminals
-Snippets for running, calling, or otherwise interacting with, **Command Prompt (CMD)**, **Windows PowerShell**, and/or **PowerShell 7**, from `.NET 5` and `.NET 6`.
+###### Updated: February 18, 2024
+Snippets used to execute scripts from a file (like a batch file `*.bat` or PowerShell script `*.ps1`) or, more commonly, directly interacting with one of the supported shells/terminals.
+
+## Currently Supported
+- **Command Prompt (CMD):** `C:\WINDOWS\System32\cmd.exe`
+- **Windows PowerShell:** `%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe`
+- **PowerShell 7:** `%PROGRAMFILES%\PowerShell\7\pwsh.exe`
 
 ---
 
-# Getting Started
+## Getting Started
 
-## Adding the `Terminals` Snippets to your Project
+### Adding the `Terminals` Snippets to your Project
 > **Note:** The example(s) below are using the `PowerShell-Update.cs` file.
 
 - Add a new class to your project and completely remove all the code that's automatically generated.
@@ -34,7 +40,7 @@ Snippets for running, calling, or otherwise interacting with, **Command Prompt (
 ```csharp
 using Snippets; // Add to the top of your file.
 
-// Obtain a list of the files in your downloads folder.
+// Obtain a list of all files in your Downloads folder.
 public static string GetFilesInDownloadsFolder()
 {
     string downloadsPath = $"C:\\Users\\{Environment.UserName}\\Downloads\\";
