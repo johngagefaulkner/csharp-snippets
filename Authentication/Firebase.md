@@ -10,6 +10,18 @@ User sign-up and sign-in using Firebase Authentication's REST API ─ perfectly 
 ### March 1, 2024
 Someone reached out to me via Discord asking for help signing users into their C# console application using Firebase Authentication. Immediately, I wanted to tell them it'll never work because Google refuses to create ***CLIENT*** SDKs for C# (.NET). However, after giving it some thought, I remembered that the Firebase Authentication service exposed a REST API that only required the public-facing "Web API Key" from the project you wanted to authenticate against. While it seems that the breadcrumb navigation has been removed from the Firebase Auth docs, ChatGPT 4 had no problems finding the link! For those interested, here's the source docs: https://firebase.google.com/docs/reference/rest/auth#section-sign-in-email-password
 
+---
+
+## Additional Firebase REST API Docs
+Apparently, the docs for the REST API are extremely difficult to find so here's what I have bookmarked:
+
+- [Firebase Realtime Database (REST API)](https://firebase.google.com/docs/reference/rest/database)
+- [Firebase Cloud Firestore (REST API)](https://firebase.google.com/docs/firestore/reference/rest)
+- [Firebase Cloud Storage (REST API)](https://firebase.google.com/docs/reference/rest/storage/rest)
+- [Firebase Remote Config (REST API)](https://firebase.google.com/docs/reference/remote-config/rest)
+
+---
+
 ## Code
 For those of you who simply want to see the implementation, he's a fully working class that can be copied and pasted into nearly any C# / .NET project:
 
