@@ -20,7 +20,7 @@ namespace Snippets.Services
 		/// <example>InitializeLogger("\\<see cref="Assembly.FullName"/>\\Logs")</example>
 		/// <param name="applicationLogPath">The path to the log files folder.</param>
 		/// <param name="isLocalLow">If the process using Logger is a low-privilege process.</param>
-		public static void InitializeLogger(string applicationLogPath, bool isLocalLow = false)
+		public static bool InitializeLogger(string applicationLogPath, bool isLocalLow = false)
 		{
 			try
 			{
@@ -28,26 +28,28 @@ namespace Snippets.Services
 				{
 					applicationLogPath = @$"{Environment.GetEnvironmentVariable("userprofile")}\AppData\LocalLow\WaferLauncher\{Version}";
 				}
-
+		
 				else
 				{
 					applicationLogPath = Path.Combine(AppDataPaths.GetDefault().LocalAppData, applicationLogPath, @"\", Version);
 				}
-
+		
 				if (!Directory.Exists(applicationLogPath))
 				{
 					Directory.CreateDirectory(applicationLogPath);
 				}
-
+		
 				var logFilePath = Path.Combine(applicationLogPath, "Log_" + DateTime.Now.ToString(@"yyyy-MM-dd", CultureInfo.InvariantCulture) + ".log");
-
+		
 				Trace.Listeners.Add(new TextWriterTraceListener(logFilePath));
 				Trace.AutoFlush = true;
+				return true;
 			}
-
+		
 			catch (Exception ex)
 			{
 				Console.WriteLine($"[ERROR] Failed to initialize logger with error message: {ex.Message}");
+				return false;
 			}
 		}
 
