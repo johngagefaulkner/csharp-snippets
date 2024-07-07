@@ -26,4 +26,19 @@ catch (Exception ex)
 
 ---
 
-The second implementation is an adaptation from a Microsoft Docs article which is similar, but not identical, to my (much more opinionated) implementation.
+`MicrosoftLogger.cs`─The second implementation─is an adaptation from a Microsoft Docs article which is similar, but not identical, to my (much more opinionated) implementation.
+- This one does have to be initialized before use.
+- By default, the log file is saved to `string logFilePath = @$"C:\Users\{Environment.GetEnvironmentVariable("%username%")}\AppData\Local\{AppInfo.Current.DisplayInfo.DisplayName}\Logs\{Assembly.Version}\Log_{DateTime.Now.ToString("yyyy-MM-dd")}.log";`
+
+**Initialization Example:**
+```cs
+public App()
+{
+	this.UnhandledException += App_UnhandledException;
+	this.InitializeComponent();
+
+  // Initialize Logger
+  bool isLoggerInitialized = Snippets.Services.LogService.MicrosoftLogger.InitializeLogger(@"\Logs\", false);
+}
+```
+
