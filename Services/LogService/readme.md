@@ -1,7 +1,7 @@
 ### Snippets // Services
 # LogService
 
-This folder contains two different approaches to logging. 
+This folder contains two different approaches to logging. Currently, I'm using my custom logging implementation in a WinUI 3 Packaged Desktop App targeting `.NET 8`, `Windows 11 Build 10.0.22621.0` and the `Windows App SDK v1.5`.
 
 The first is my own custom logger that's intended to use your project's root namespace so that it can be universally called by simply `Log`.
 - The Logger is a static singleton instance that does not need to be manually initialized (it initializes itself.)
