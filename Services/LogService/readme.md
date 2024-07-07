@@ -12,15 +12,15 @@ For example:
 ```cs
 try
 {
-  // Log some information
-  Log.Info("Successfully performed task!");
+	// Log some information
+	Log.Info("Successfully performed task!");
 }
 
 catch (Exception ex)
 {
-  // Log an error message with exception, StackTrace, and caller information included automatically
-  // Pass the thrown Exception object through as a parameter and, optionally, include a custom message string to provide context.
-  Log.Error(ex, "Failed to perform task!");
+	// Log an error message with exception, StackTrace, and caller information included automatically
+	// Pass the thrown Exception object through as a parameter and, optionally, include a custom message string to provide context.
+	Log.Error(ex, "Failed to perform task!");
 }
 ```
 
@@ -34,11 +34,11 @@ catch (Exception ex)
 ```cs
 public App()
 {
-    this.UnhandledException += App_UnhandledException;
-    this.InitializeComponent();
-
-    // Initialize Logger
-    bool isLoggerInitialized = Snippets.Services.LogService.MicrosoftLogger.InitializeLogger(@"\Logs\", false);
+	this.UnhandledException += App_UnhandledException;
+	this.InitializeComponent();
+	
+	// Initialize Logger
+	bool isLoggerInitialized = Snippets.Services.LogService.MicrosoftLogger.InitializeLogger(@"\Logs\", false);
 }
 ```
 
