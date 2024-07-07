@@ -34,11 +34,11 @@ catch (Exception ex)
 ```cs
 public App()
 {
-	this.UnhandledException += App_UnhandledException;
-	this.InitializeComponent();
+    this.UnhandledException += App_UnhandledException;
+    this.InitializeComponent();
 
-  // Initialize Logger
-  bool isLoggerInitialized = Snippets.Services.LogService.MicrosoftLogger.InitializeLogger(@"\Logs\", false);
+    // Initialize Logger
+    bool isLoggerInitialized = Snippets.Services.LogService.MicrosoftLogger.InitializeLogger(@"\Logs\", false);
 }
 ```
 
