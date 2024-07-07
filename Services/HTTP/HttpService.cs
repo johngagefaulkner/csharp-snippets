@@ -16,25 +16,38 @@ namespace Snippets.Services.HTTP
 {
     public class HttpService
     {
-        public static HttpClient GlobalHttpClient { get; set; } = null;
+        private static readonly HttpClient _httpClient = new();
 
         /// <summary>
-        /// Perform an HTTP GET request to a URL using an HTTP Authorization header
+        /// Provides a way for the internal/private HttpClient object to be accessed directly if necessary.
+        /// </summary>
+        public static HttpClient GetHttpClient() => _httpClient;
+
+        /// <summary>
+        /// Performs an HTTP GET request to a URL using an HTTP Authorization header.
         /// </summary>
         /// <param name="url">The URL</param>
         /// <param name="token">The token</param>
         /// <returns>String containing the results of the GET operation</returns>
-        public async Task<string> GetHttpContentWithToken(string url, string token, HttpClient _client)
+        public static async Task<string> GetStringFromAuthenticatedRequestAsync(string url, string token)
         {
-            System.Net.Http.HttpResponseMessage response;
+            HttpResponseMessage response;
             try
             {
+                // Create the HttpRequestMessage to send
                 var request = new HttpRequestMessage(HttpMethod.Get, url);
-                //Add the token in Authorization header
+                
+                // Add the token in Authorization header
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                response = await _client.SendAsync(request);
-                var content = await response.Content.ReadAsStringAsync();
-                return content;
+
+                // Send the request and ensure the response's status code indicates success
+                response = await _httpClient.SendAsync(request);
+                if (response.IsSuccessStatusCode())
+                {
+                    return await response.Content.ReadAsStringAsync();
+                }
+
+                return null;
             }
             catch (Exception ex)
             {
@@ -44,12 +57,8 @@ namespace Snippets.Services.HTTP
 
         // Uses the provided HttpClient to send a GET request to the provided URL.
         // Assumes the response is a JSON string and converts it to the provided type.
-        public static async Task<T> GetFromUrlAsync<T>(string jsonUrl, HttpClient _client)
-        {
-            return await _client.GetFromJsonAsync<T>(jsonUrl);
-        }
+        public static async Task<T> GetFromUrlAsync<T>(string httpRequestUrl) => await _httpClient.GetFromJsonAsync<T>(httpRequestUrl);
 
-        #region WorkingWithFiles
         public static async Task<bool> DownloadFileAsync(string _url, string _filename)
         {
             try
@@ -65,31 +74,9 @@ namespace Snippets.Services.HTTP
 
             catch (Exception ex)
             {
-                string errorStr = "Error: " + ex.Message;
+                Console.WriteLine($"[ERROR] Failed to download file with error message: {ex.Message}");
                 return false;
             }
         }
-
-        public static async Task<string> DownloadRSSFeed(string _url, string _filename)
-        {
-            try
-            {
-                using (WebClient wc = new())
-                {
-                    var _result = await wc.DownloadStringTaskAsync(_url);
-                    await File.WriteAllTextAsync(_filename, _result.Trim());
-                }
-
-                string str = await File.ReadAllTextAsync(_filename);
-                Task.WaitAll();
-                return str.Trim();
-            }
-
-            catch (Exception ex)
-            {
-                return "Error: " + ex.Message;
-            }
-        }
-        #endregion
     }
 }
