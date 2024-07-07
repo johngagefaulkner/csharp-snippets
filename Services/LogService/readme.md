@@ -6,7 +6,7 @@ This folder contains two different approaches to logging. Currently, I'm using m
 The first is my own custom logger that's intended to use your project's root namespace so that it can be universally called by simply `Log`.
 - The Logger is a static singleton instance that does not need to be manually initialized (it initializes itself.)
 - Each log entry is automatically prepended with a sortable timestamp, log severity and caller info.
-- The log file is automatically created if it doesn't exist at `C:\Users\%USERNAME%\AppData\Local\$AppName\Logs\$Date_Main.log`
+- The log file is automatically created if it doesn't exist at `C:\Users\%USERNAME%\AppData\Local\$AppName\Logs\$Date_Main.log`.
 
 For example:
 ```cs
