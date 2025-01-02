@@ -11,14 +11,16 @@ namespace Snippets.Performance;
 
 internal static class DataCollections
 {
-  public record Customer(int Id, string FirstName, string LastName, string EmailAddress, string PhoneNumber);
-  private static List<Customer> Customers = new()
-  {
-    new(0, John, Doe, john.doe@gmail.com, 6785881234),
-    new(1, Mary, Smith, mary.smith@gmail.com, 7706861994)
-  };
-  public static IEnumerable<Customer> GetCustomers() => Customers;
-  
+	public record Customer(int Id, string FirstName, string LastName, string EmailAddress, int PhoneNumber);
+
+	private static List<Customer> Customers = new()
+	{
+	new(0, John, Doe, john.doe@gmail.com, 6785881234),
+	new(1, Mary, Smith, mary.smith@gmail.com, 7706861994)
+	};
+
+	public static IEnumerable<Customer> GetCustomers() => Customers;
+
 	public void ReadWithForEachUsingSpan()
 	{
 		foreach (var _customer in CollectionsMarshal.AsSpan(Customers))
