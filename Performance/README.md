@@ -7,13 +7,26 @@
 ### Fastest Iteration of a Collection `List<T>`
   
 ```csharp
-private static List<int> _list = new();
+namespace Snippets.Performance;
 
-public void ReadWithForEachUsingSpan()
+internal static class DataCollections
 {
-    foreach (var item in CollectionsMarshal.AsSpan(_list))
-    {
-       // Do whatever with the item here
-    }
+  public record Customer(int Id, string FirstName, string LastName, string EmailAddress, string PhoneNumber);
+  private static List<Customer> Customers = new()
+  {
+    new(0, John, Doe, john.doe@gmail.com, 6785881234),
+    new(1, Mary, Smith, mary.smith@gmail.com, 7706861994)
+  };
+  public static IEnumerable<Customer> GetCustomers() => Customers;
+  
+	public void ReadWithForEachUsingSpan()
+	{
+		foreach (var _customer in CollectionsMarshal.AsSpan(Customers))
+		{
+			// Do whatever with the item here
+			Console.WriteLine($"[{_customer.Id}] {_customer.FirstName} {_customer.LastName}");
+			// Prints "[0] John Doe"
+		}
+	}
 }
 ```
