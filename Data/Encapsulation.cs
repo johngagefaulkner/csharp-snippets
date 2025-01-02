@@ -1,8 +1,8 @@
 using System;
 
-namespace Snippets;
+namespace Snippets.Data;
 
-public class Data
+internal static class DataEncapsulation
 {
   // Encapsulation Example with Sample Data
   public class BankAccount
@@ -14,9 +14,12 @@ public class Data
           get { return _balance; }
           private set
           {
-              if (value < 0)
-                  throw new ArgumentException("Balance cannot be negative.");
-              _balance = value;
+            if (value < 0)
+            {
+              throw new ArgumentException("Balance cannot be negative.");
+            }
+
+            _balance = value;
           }
       }
 
@@ -40,5 +43,11 @@ public class Data
               throw new ArgumentException("Insufficient funds.");
           Balance -= amount;
       }
+
+    public decimal WithdrawAndReturnBalance(decimal withdrawalAmount)
+    {
+      Withdraw(withdrawalAmount);
+      return Balance;
+    }
   }
 }
