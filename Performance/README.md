@@ -15,8 +15,8 @@ internal static class DataCollections
 
 	private static List<Customer> Customers = new()
 	{
-	new(0, John, Doe, john.doe@gmail.com, 6785881234),
-	new(1, Mary, Smith, mary.smith@gmail.com, 7706861994)
+		new(0, John, Doe, john.doe@gmail.com, 6785881234),
+		new(1, Mary, Smith, mary.smith@gmail.com, 7706861994)
 	};
 
 	public static IEnumerable<Customer> GetCustomers() => Customers;
