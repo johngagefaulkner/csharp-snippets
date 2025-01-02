@@ -86,9 +86,10 @@ internal static class CustomerData
 		// Income between $20k and $200k
 		// .RuleFor(c => c.AnnualIncome, f => f.Random.Int(20_000, 200_000));
 	
-	for (int i = 0; i < count; i++)
-	{
-		yield return faker.Generate();
+		for (int i = 0; i < count; i++)
+		{
+			yield return faker.Generate();
+		}
 	}
 	
 	public class Statistic : IEquatable
